@@ -10,15 +10,15 @@
     --bg-grid: rgba(0,0,0,.045);
     --panel:#ffffff;
     --panel-2:#f4f5f6;
-    --line:#d8dadd;
-    --cyan:#0a6b8a;
-    --cyan-dim:#8aa2ab;
-    --amber:#b5541a;
-    --amber-dim:#c98a5b;
-    --ink:#111214;
-    --ink-dim:#5a5f66;
-    --ok:#2f7d4f;
-    --ko:#b23b3b;
+    --line:#c7cacf;
+    --cyan:#054a61;
+    --cyan-dim:#5c7883;
+    --amber:#8a3c11;
+    --amber-dim:#a85f2e;
+    --ink:#000000;
+    --ink-dim:#33383e;
+    --ok:#215c39;
+    --ko:#8f2626;
     --mono: 'JetBrains Mono', 'Courier New', monospace;
     --sans: 'IBM Plex Sans', 'Segoe UI', sans-serif;
     --disp: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
@@ -32,6 +32,7 @@
       var(--bg);
     color:var(--ink);
     font-family:var(--sans);
+    font-weight:500;
     -webkit-font-smoothing:antialiased;
     min-height:100vh;
   }
@@ -69,6 +70,24 @@
   .rtab.active{ color:var(--amber); }
   .rtab.active .code{ color:var(--amber); }
   .rtab.active::after{ content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:var(--amber); }
+  .rtab.locked{ color:#c3c6ca; cursor:not-allowed; }
+  .rtab.locked:hover{ color:#c3c6ca; }
+  .rtab.locked .code{ color:#c3c6ca; }
+  .rtab .lock-icon{ margin-right:6px; font-size:10px; }
+  .rtab .done-icon{ margin-right:6px; color:var(--ok); }
+  .lock-hint{
+    display:none; align-items:center; gap:8px; font-family:var(--mono); font-size:12px;
+    color:var(--ko); background:rgba(178,59,59,.08); border:1px solid var(--ko);
+    border-radius:6px; padding:9px 14px; margin:0 6vw 0; max-width:640px;
+  }
+  .lock-hint.show{ display:flex; }
+  .next-btn{
+    font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:.06em;
+    border:1px solid var(--ok); background:var(--ok); color:#fff; padding:11px 20px;
+    border-radius:6px; cursor:pointer; display:none; align-items:center; gap:8px;
+  }
+  .next-btn.show{ display:inline-flex; }
+  .next-btn:hover{ opacity:.85; }
 
   main{ padding:48px 6vw 100px; max-width:1360px; margin:0 auto; }
   section.panel{ display:none; }
@@ -232,6 +251,7 @@
 </header>
 
 <nav class="robots" id="robotNav"></nav>
+<div class="lock-hint" id="lockHint">🔒 Complete the quiz below before moving to the next robot.</div>
 <main id="mainContent"></main>
 
 <div class="glossary-wrap" id="glossary" style="padding:0 6vw;">
@@ -558,11 +578,14 @@ function pickVocabFor(id){
   return GLOSSARY.filter(g => g[4].includes(id));
 }
 
+let unlockedUpTo = 0; // index of the last unlocked robot (progressive quiz gating)
+
 ROBOTS.forEach((r, i) => {
   const btn = document.createElement('button');
-  btn.className = 'rtab' + (i===0 ? ' active' : '');
+  btn.className = 'rtab' + (i===0 ? ' active' : '') + (i>0 ? ' locked' : '');
   btn.dataset.id = r.id;
-  btn.innerHTML = `<span class="code">${r.code}</span>${r.name}`;
+  btn.dataset.index = i;
+  btn.innerHTML = tabLabel(r, i);
   btn.onclick = () => selectRobot(r.id);
   nav.appendChild(btn);
 
@@ -579,6 +602,8 @@ ROBOTS.forEach((r, i) => {
     </div>`).join('');
 
   const nq = QUIZZES[r.id].length;
+  const isLast = i === ROBOTS.length - 1;
+  const next = ROBOTS[i+1];
 
   sec.innerHTML = `
     <div class="robot-head">
@@ -610,7 +635,7 @@ ROBOTS.forEach((r, i) => {
       <div class="quiz-intro">
         <div>
           <h3 class="section-label" style="margin-bottom:4px;">Comprehension Quiz</h3>
-          <p>Test what you've learned about the vocabulary and parts of the ${r.name}.</p>
+          <p>Test what you've learned about the vocabulary and parts of the ${r.name}${isLast ? '.' : ' — required before unlocking ' + next.name + '.'}</p>
         </div>
         <div class="quiz-score" id="score-${r.id}">Score: <b>0</b> / ${nq}</div>
       </div>
@@ -619,14 +644,40 @@ ROBOTS.forEach((r, i) => {
         <button class="btn" id="check-${r.id}">Check my answers</button>
         <button class="btn secondary" id="retry-${r.id}">Try again</button>
         <div class="quiz-result" id="result-${r.id}"></div>
+        ${isLast
+          ? `<button class="next-btn" id="next-${r.id}" data-target="glossary">🎉 All done — go to the glossary ↓</button>`
+          : `<button class="next-btn" id="next-${r.id}" data-target="${next.id}">Next: ${next.name} →</button>`}
       </div>
     </div>
   `;
   main.appendChild(sec);
-  buildQuiz(r.id);
+  buildQuiz(r.id, isLast ? null : next.id);
 });
 
+function tabLabel(r, i){
+  const icon = i > unlockedUpTo ? '<span class="lock-icon">🔒</span>' : '';
+  return `<span class="code">${r.code}</span>${icon}${r.name}`;
+}
+
+function refreshNav(){
+  document.querySelectorAll('.rtab').forEach(b => {
+    const idx = parseInt(b.dataset.index, 10);
+    const locked = idx > unlockedUpTo;
+    b.classList.toggle('locked', locked);
+    b.innerHTML = tabLabel(ROBOTS[idx], idx);
+  });
+}
+
 function selectRobot(id){
+  const idx = ROBOTS.findIndex(r => r.id === id);
+  const hint = document.getElementById('lockHint');
+  if(idx > unlockedUpTo){
+    hint.classList.add('show');
+    clearTimeout(window._hintTimer);
+    window._hintTimer = setTimeout(() => hint.classList.remove('show'), 2600);
+    return;
+  }
+  hint.classList.remove('show');
   document.querySelectorAll('.rtab').forEach(b => b.classList.toggle('active', b.dataset.id === id));
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-'+id));
   window.scrollTo({top: nav.offsetTop, behavior:'smooth'});
@@ -636,13 +687,14 @@ document.getElementById('statTerms').textContent = GLOSSARY.length + '+';
 document.getElementById('statParts').textContent = ROBOTS.reduce((s,r)=>s+r.parts.length,0) + '+';
 
 /* ---------------- QUIZ LOGIC ---------------- */
-function buildQuiz(robotId){
+function buildQuiz(robotId, nextId){
   const questions = QUIZZES[robotId];
   const container = document.getElementById('quiz-' + robotId);
   const checkBtn = document.getElementById('check-' + robotId);
   const retryBtn = document.getElementById('retry-' + robotId);
   const scoreEl = document.getElementById('score-' + robotId);
   const resultEl = document.getElementById('result-' + robotId);
+  const nextBtn = document.getElementById('next-' + robotId);
 
   function render(){
     container.innerHTML = questions.map((item, qi) => `
@@ -662,6 +714,7 @@ function buildQuiz(robotId){
     `).join('');
     checkBtn.disabled = false;
     resultEl.classList.remove('show');
+    nextBtn.classList.remove('show');
     scoreEl.innerHTML = `Score: <b>0</b> / ${questions.length}`;
   }
   render();
@@ -707,9 +760,25 @@ function buildQuiz(robotId){
         ? "Not bad — review the mistakes above."
         : "A bit more practice needed — re-read the key vocabulary on the left.";
     checkBtn.disabled = true;
+
+    // Unlock the next section now that this quiz has been completed
+    const thisIdx = ROBOTS.findIndex(r => r.id === robotId);
+    if(thisIdx >= unlockedUpTo){
+      unlockedUpTo = thisIdx + 1;
+      refreshNav();
+    }
+    nextBtn.classList.add('show');
   };
 
   retryBtn.onclick = render;
+
+  nextBtn.onclick = () => {
+    if(nextId){
+      selectRobot(nextId);
+    } else {
+      document.getElementById('glossary').scrollIntoView({behavior:'smooth'});
+    }
+  };
 }
 
 /* ---------------- GLOSSARY SEARCH/FILTER ---------------- */
