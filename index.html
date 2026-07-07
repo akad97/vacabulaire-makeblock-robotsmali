@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lexique Robotique — Makeblock EN/FR</title>
+<style>
+  :root{
+    --bg:#ffffff;
+    --bg-grid: rgba(0,0,0,.045);
+    --panel:#ffffff;
+    --panel-2:#f4f5f6;
+    --line:#d8dadd;
+    --cyan:#0a6b8a;
+    --cyan-dim:#8aa2ab;
+    --amber:#b5541a;
+    --amber-dim:#c98a5b;
+    --ink:#111214;
+    --ink-dim:#5a5f66;
+    --ok:#2f7d4f;
+    --ko:#b23b3b;
+    --mono: 'JetBrains Mono', 'Courier New', monospace;
+    --sans: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+    --disp: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0/42px 42px,
+      linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0/42px 42px,
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  ::selection{ background:var(--amber); color:#ffffff; }
+
+  header.hero{ position:relative; padding:64px 6vw 40px; border-bottom:1px solid var(--line); overflow:hidden; }
+  .eyebrow{
+    font-family:var(--mono); color:var(--cyan); letter-spacing:.28em; font-size:11px;
+    text-transform:uppercase; display:flex; align-items:center; gap:10px; margin-bottom:18px;
+  }
+  .eyebrow::before{ content:""; width:26px; height:1px; background:var(--cyan); display:inline-block; }
+  h1.title{
+    font-family:var(--disp); font-weight:700; font-size:clamp(38px, 6vw, 74px);
+    line-height:1.02; margin:0 0 8px; color:#000; max-width:920px;
+  }
+  h1.title .fr{ color:var(--amber); }
+  .subtitle{ font-size:16px; color:var(--ink-dim); max-width:640px; line-height:1.55; margin-top:18px; }
+  .schematic{ position:absolute; right:4vw; top:30px; width:min(360px, 30vw); opacity:.9; pointer-events:none; }
+  .hero-stats{ display:flex; gap:28px; margin-top:38px; flex-wrap:wrap; }
+  .hero-stat{ font-family:var(--mono); font-size:12px; color:var(--ink-dim); border-left:2px solid var(--cyan-dim); padding-left:10px; }
+  .hero-stat b{ display:block; font-family:var(--disp); font-size:26px; color:var(--cyan); font-weight:700; }
+
+  nav.robots{
+    position:sticky; top:0; z-index:40; display:flex; gap:0; flex-wrap:wrap;
+    background:rgba(255,255,255,.94); backdrop-filter: blur(8px);
+    border-bottom:1px solid var(--line); padding:0 6vw;
+  }
+  .rtab{
+    font-family:var(--mono); font-size:12.5px; color:var(--ink-dim); background:none; border:none;
+    padding:16px 18px; cursor:pointer; position:relative; letter-spacing:.02em;
+    border-right:1px solid var(--line); transition:color .15s; white-space:nowrap;
+  }
+  .rtab .code{ color:var(--cyan-dim); margin-right:8px; }
+  .rtab:hover{ color:var(--ink); }
+  .rtab.active{ color:var(--amber); }
+  .rtab.active .code{ color:var(--amber); }
+  .rtab.active::after{ content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:var(--amber); }
+
+  main{ padding:48px 6vw 100px; max-width:1360px; margin:0 auto; }
+  section.panel{ display:none; }
+  section.panel.active{ display:block; animation:fade .35s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+  .robot-head{
+    display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:20px;
+    border-bottom:1px dashed var(--line); padding-bottom:22px; margin-bottom:32px;
+  }
+  .robot-head h2{ font-family:var(--disp); font-size:clamp(26px,3.4vw,40px); margin:0; color:#000; font-weight:700; }
+  .robot-head p{ color:var(--ink-dim); max-width:560px; margin:8px 0 0; line-height:1.5; font-size:14.5px; }
+  .tagbar{ display:flex; gap:8px; flex-wrap:wrap; }
+  .tag{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; color:var(--cyan);
+    border:1px solid var(--cyan-dim); border-radius:3px; padding:5px 9px; text-transform:uppercase;
+  }
+
+  .grid-2{ display:grid; grid-template-columns: 1.5fr 1fr; gap:34px; }
+  @media (max-width: 980px){ .grid-2{ grid-template-columns:1fr; } }
+
+  h3.section-label{
+    font-family:var(--mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--amber); margin:0 0 16px; display:flex; align-items:center; gap:10px;
+  }
+  h3.section-label::before{ content:"§"; color:var(--cyan-dim); }
+
+  .parts-table{ width:100%; border-collapse:collapse; font-size:13px; }
+  .parts-table thead th{
+    text-align:left; font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.1em;
+    color:var(--ink-dim); font-weight:500; border-bottom:1px solid var(--line); padding:8px 10px;
+    position:sticky; top:0; background:var(--panel-2);
+  }
+  .parts-table tbody td{ padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  .parts-table tbody tr:hover{ background:rgba(10,107,138,.05); }
+  .en{ color:var(--ink); font-weight:600; }
+  .fr-cell{ color:var(--amber); font-style:italic; }
+  .note-en{ color:var(--ink-dim); font-size:12px; }
+  .note-fr{ color:var(--ink-dim); font-size:12px; font-style:italic; }
+
+  .part-scroll{ max-height:560px; overflow-y:auto; border:1px solid var(--line); border-radius:6px; padding:4px 14px; background:var(--panel-2); }
+  .part-scroll::-webkit-scrollbar{ width:8px; }
+  .part-scroll::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
+
+  .vocab-card{ background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:16px 18px; margin-bottom:12px; position:relative; }
+  .vocab-card .pin{ position:absolute; left:-1px; top:16px; bottom:16px; width:3px; background:var(--cyan-dim); border-radius:2px; }
+  .vocab-en{ font-family:var(--disp); font-weight:700; font-size:16px; color:#000; }
+  .vocab-fr{ font-family:var(--sans); font-style:italic; color:var(--amber); font-size:14.5px; margin-top:2px; }
+  .vocab-def{ color:var(--ink-dim); font-size:12.8px; margin-top:8px; line-height:1.5; }
+
+  /* ---------- QUIZ ---------- */
+  .quiz-wrap{ margin-top:44px; border-top:1px dashed var(--line); padding-top:32px; }
+  .quiz-intro{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:20px; }
+  .quiz-intro p{ color:var(--ink-dim); font-size:13.5px; max-width:520px; margin:6px 0 0; }
+  .quiz-score{
+    font-family:var(--mono); font-size:12px; color:var(--ink-dim); border:1px solid var(--line);
+    border-radius:20px; padding:7px 14px; white-space:nowrap;
+  }
+  .quiz-score b{ color:var(--cyan); }
+  .quiz-list{ display:flex; flex-direction:column; gap:18px; }
+  .qcard{ background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:18px 20px; }
+  .qcard .qnum{ font-family:var(--mono); font-size:11px; color:var(--cyan); letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; display:block; }
+  .qcard .qtext{ font-family:var(--disp); font-weight:600; font-size:15.5px; color:#000; margin-bottom:12px; }
+  .qopts{ display:flex; flex-direction:column; gap:8px; }
+  .qopt{
+    display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:7px;
+    padding:9px 12px; cursor:pointer; font-size:13.5px; background:#fff; transition:.12s;
+  }
+  .qopt:hover{ border-color:var(--cyan-dim); }
+  .qopt input{ accent-color:var(--cyan); }
+  .qopt.correct{ border-color:var(--ok); background:rgba(47,125,79,.08); }
+  .qopt.wrong{ border-color:var(--ko); background:rgba(178,59,59,.08); }
+  .qfeedback{ margin-top:10px; font-size:12.5px; font-family:var(--mono); display:none; }
+  .qfeedback.show{ display:block; }
+  .qfeedback.ok{ color:var(--ok); }
+  .qfeedback.ko{ color:var(--ko); }
+  .quiz-actions{ display:flex; gap:12px; margin-top:22px; align-items:center; flex-wrap:wrap; }
+  .btn{
+    font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:.06em;
+    border:1px solid var(--cyan); background:var(--cyan); color:#fff; padding:11px 20px;
+    border-radius:6px; cursor:pointer; transition:.15s;
+  }
+  .btn:hover{ opacity:.85; }
+  .btn:disabled{ opacity:.5; cursor:default; }
+  .btn.secondary{ background:#fff; color:var(--ink-dim); border-color:var(--line); }
+  .btn.secondary:hover{ border-color:var(--cyan-dim); color:var(--ink); }
+  .quiz-result{ font-family:var(--mono); font-size:13px; padding:10px 16px; border-radius:7px; display:none; border:1px solid var(--line); }
+  .quiz-result.show{ display:inline-block; }
+
+  /* ---------- GLOSSARY ---------- */
+  .glossary-wrap{ margin-top:90px; border-top:1px solid var(--line); padding-top:44px; }
+  .glossary-controls{
+    display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-bottom:26px;
+    position:sticky; top:57px; z-index:30; background:var(--bg); padding:14px 0;
+  }
+  #search{
+    flex:1; min-width:220px; background:var(--panel-2); border:1px solid var(--line); color:var(--ink);
+    font-family:var(--mono); font-size:13.5px; padding:12px 16px; border-radius:6px; outline:none;
+  }
+  #search:focus{ border-color:var(--cyan); }
+  #search::placeholder{ color:var(--ink-dim); }
+  .cat-filters{ display:flex; gap:8px; flex-wrap:wrap; }
+  .cat-btn{
+    font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+    background:none; border:1px solid var(--line); color:var(--ink-dim);
+    padding:8px 12px; border-radius:20px; cursor:pointer; transition:.15s;
+  }
+  .cat-btn:hover{ border-color:var(--cyan-dim); color:var(--ink); }
+  .cat-btn.active{ background:var(--cyan); border-color:var(--cyan); color:#fff; font-weight:600; }
+  .glos-count{ font-family:var(--mono); color:var(--ink-dim); font-size:12px; margin-bottom:16px; }
+  .glos-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:14px; }
+  .glos-item{
+    background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:15px 17px;
+    transition:.15s; cursor:default; box-shadow:0 1px 2px rgba(0,0,0,.03);
+  }
+  .glos-item:hover{ border-color:var(--cyan-dim); transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,.06); }
+  .glos-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .glos-en{ font-family:var(--disp); font-weight:700; font-size:15.5px; color:#000; }
+  .glos-badge{
+    font-family:var(--mono); font-size:9px; text-transform:uppercase; color:var(--cyan);
+    border:1px solid var(--cyan-dim); border-radius:3px; padding:2px 6px; white-space:nowrap;
+  }
+  .glos-fr{ font-family:var(--sans); font-style:italic; color:var(--amber); font-size:14px; margin-top:4px; }
+  .glos-def{ color:var(--ink-dim); font-size:12.3px; margin-top:8px; line-height:1.5; }
+  .glos-robots{ margin-top:10px; display:flex; gap:5px; flex-wrap:wrap; }
+  .rchip{ font-family:var(--mono); font-size:9px; background:var(--panel-2); color:var(--ink-dim); padding:2px 6px; border-radius:3px; border:1px solid var(--line); }
+  .no-results{ color:var(--ink-dim); font-family:var(--mono); font-size:13px; padding:40px 0; text-align:center; }
+
+  footer{ text-align:center; padding:40px 6vw 60px; color:var(--ink-dim); font-family:var(--mono); font-size:11.5px; border-top:1px solid var(--line); }
+  .kbd{ font-family:var(--mono); background:var(--panel-2); border:1px solid var(--line); border-radius:4px; padding:1px 6px; font-size:11px; }
+
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <svg class="schematic" viewBox="0 0 300 220" fill="none">
+    <circle cx="150" cy="110" r="4" fill="#0a6b8a"/>
+    <path d="M150 110 L60 60" stroke="#8aa2ab" stroke-width="1"/>
+    <path d="M150 110 L240 55" stroke="#8aa2ab" stroke-width="1"/>
+    <path d="M150 110 L50 150" stroke="#8aa2ab" stroke-width="1"/>
+    <path d="M150 110 L250 165" stroke="#8aa2ab" stroke-width="1"/>
+    <path d="M150 110 L150 20" stroke="#8aa2ab" stroke-width="1"/>
+    <circle cx="60" cy="60" r="3" fill="#b5541a"/>
+    <circle cx="240" cy="55" r="3" fill="#b5541a"/>
+    <circle cx="50" cy="150" r="3" fill="#b5541a"/>
+    <circle cx="250" cy="165" r="3" fill="#b5541a"/>
+    <circle cx="150" cy="20" r="3" fill="#b5541a"/>
+    <rect x="130" y="95" width="40" height="30" rx="3" stroke="#0a6b8a" stroke-width="1"/>
+    <text x="150" y="200" text-anchor="middle" fill="#8aa2ab" font-family="monospace" font-size="9">EN ⇄ FR</text>
+  </svg>
+  <div class="eyebrow">Makeblock — Documentation technique bilingue</div>
+  <h1 class="title">Lexique Robotique<br><span class="fr">Anglais ⇄ Français</span></h1>
+  <p class="subtitle">Vocabulaire technique, composants électroniques et listes de pièces extraits des cinq manuels Makeblock : Neuron, mBot v1.1, mBot Ranger, mBot2/CyberPi et Ultimate 2.0. Cliquez un onglet pour explorer un robot, testez-vous avec le quiz, ou utilisez le glossaire général tout en bas.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><b>5</b>manuels sources</div>
+    <div class="hero-stat"><b id="statTerms">—</b>termes bilingues</div>
+    <div class="hero-stat"><b id="statParts">—</b>pièces référencées</div>
+  </div>
+</header>
+
+<nav class="robots" id="robotNav"></nav>
+<main id="mainContent"></main>
+
+<div class="glossary-wrap" id="glossary" style="padding:0 6vw;">
+  <h3 class="section-label">Glossaire général — tous robots confondus</h3>
+  <div class="glossary-controls">
+    <input id="search" type="text" placeholder="Rechercher un terme… (EN ou FR) — ex: capteur, sensor, moteur…">
+    <div class="cat-filters" id="catFilters"></div>
+  </div>
+  <div class="glos-count" id="glosCount"></div>
+  <div class="glos-grid" id="glosGrid"></div>
+  <div class="no-results" id="noResults" style="display:none;">Aucun terme ne correspond à cette recherche.</div>
+</div>
+
+<footer>
+  Compilé à partir de : Neuron_instructions.pdf · mBot_V1_1_Blue_STD_Instruction.pdf · mBot-Ranger_Blue_STD.pdf · mb10132_blockcoding_instruction_manual.pdf · Ultimate-V2_0_EN.pdf<br>
+  Astuce : le champ de recherche du glossaire filtre en direct — pas besoin de <span class="kbd">Ctrl</span>+<span class="kbd">F</span>.
+</footer>
+
+<script>
+/* ============================================================
+   DATA — parts: [English, Français, Note EN, Note FR]
+   ============================================================ */
+
+const ROBOTS = [
+  {
+    id: "neuron", code: "01", name: "Makeblock Neuron",
+    tagline: "All-in-One Kit — magnetic modular blocks",
+    tags: ["Blocs magnétiques", "App Neuron", "mBlock", "IoT"],
+    description: "Système de blocs électroniques codés par couleur qui s'assemblent magnétiquement : énergie/communication (vert), contrôle (orange), entrée (jaune) et sortie (bleu). Programmable via l'app Makeblock Neuron ou mBlock.",
+    parts: [
+      ["Power block","Bloc d'alimentation","Green — powers the other blocks, 950mAh battery","Vert — alimente les autres blocs, batterie 950mAh"],
+      ["Bluetooth block","Bloc Bluetooth","Green — wireless link + Micro USB port","Vert — connexion sans fil + port Micro USB"],
+      ["Wi-Fi block","Bloc Wi-Fi","Green — Wi-Fi connection + IoT features","Vert — connexion Wi-Fi + fonctions IoT"],
+      ["Wireless Transmitter","Émetteur sans fil","Green — sends a signal to the receiver (10m)","Vert — envoie un signal au récepteur (10m)"],
+      ["Wireless Receiver","Récepteur sans fil","Green — receives the signal from the transmitter","Vert — reçoit le signal de l'émetteur"],
+      ["Button","Bouton","Orange — short press or 2-second hold","Orange — pression courte ou maintenue 2s"],
+      ["Knob","Bouton rotatif / potentiomètre","Orange — increases/decreases the output","Orange — augmente/diminue la sortie"],
+      ["Joystick","Joystick / manette","Orange — X and Y axes","Orange — axes X et Y"],
+      ["Voice Recognition","Reconnaissance vocale","Orange — programmable voice commands","Orange — commandes vocales programmables"],
+      ["Funny Touch","Capteur tactile ludique","Orange — 4 touch switches + ground wire","Orange — 4 interrupteurs tactiles + fil de masse"],
+      ["Light Sensor","Capteur de lumière","Yellow — value from 0 to 100","Jaune — valeur 0 à 100"],
+      ["Color Sensor","Capteur de couleur","Yellow — detects colors","Jaune — détecte les couleurs"],
+      ["Gyro Sensor","Capteur gyroscopique","Yellow — angular rate and acceleration","Jaune — vitesse angulaire et accélération"],
+      ["Sound Sensor","Capteur de son","Yellow — sound intensity 0 to 100","Jaune — intensité sonore 0 à 100"],
+      ["PIR Sensor","Capteur infrarouge passif (mouvement)","Yellow — detects human motion (3m)","Jaune — détecte le mouvement humain (3m)"],
+      ["Humiture Sensor","Capteur d'humidité/température","Yellow — ambient temperature + humidity","Jaune — température + humidité ambiantes"],
+      ["Temperature Sensor","Capteur de température","Yellow — probe -30°C to 100°C","Jaune — sonde -30°C à 100°C"],
+      ["Soil Moisture Sensor","Capteur d'humidité du sol","Yellow — soil humidity","Jaune — humidité de la terre"],
+      ["Line Follower Sensor","Capteur suiveur de ligne","Yellow — detects black/white line, 1-2cm","Jaune — détecte ligne noire/blanche, 1-2cm"],
+      ["Ultrasonic Sensor","Capteur à ultrasons","Yellow — distance measurement 3-300cm","Jaune — mesure de distance 3-300cm"],
+      ["Camera","Caméra","Yellow — takes photos via Wi-Fi + app","Jaune — prise de photo via Wi-Fi + app"],
+      ["RGB LED","LED RVB","Blue — adjustable color/brightness","Bleu — couleur/luminosité réglable"],
+      ["LED Strip Driver + LED Strip","Pilote de ruban LED + ruban","Blue — 15 individual RGB LEDs","Bleu — 15 LED RVB individuelles"],
+      ["LED Panel (Display driver)","Panneau LED","Blue — 64 RGB LEDs","Bleu — 64 LED RVB"],
+      ["EL Wire Driver","Pilote de fil électroluminescent","Blue — drives 4 EL wires","Bleu — pilote 4 fils EL"],
+      ["Display","Écran / afficheur","Blue — shows the output parameters","Bleu — affiche les paramètres de sortie"],
+      ["Dual Servo Driver + Servo","Pilote double servo + servomoteur","Blue — 0-180° rotation","Bleu — rotation 0-180°"],
+      ["Dual DC Motor Driver","Pilote double moteur CC","Blue — drives motor + water pump","Bleu — pilote moteur + pompe à eau"],
+      ["Buzzer","Buzzer / avertisseur sonore","Blue — makes a sound on an ON signal","Bleu — émet un son au signal ON"],
+      ["Mic & Speaker","Micro et haut-parleur","Blue — audio recording/playback","Bleu — enregistrement/lecture audio"],
+      ["Laser Pointer","Pointeur laser","Accessory — rechargeable battery, 40h","Accessoire — batterie rechargeable, 40h"],
+      ["Magnet Wire","Fil magnétique","Accessory — flexible link between blocks","Accessoire — connexion flexible entre blocs"],
+      ["USB Cable","Câble USB","Accessory — power/data","Accessoire — alimentation/données"],
+      ["Neuron Board","Plaque de montage Neuron","Accessory — mounts blocks/LEGO/Makeblock parts","Accessoire — fixation blocs/LEGO/Makeblock"],
+      ["Slick Tyre","Pneu lisse","Accessory — 42×9.5mm","Accessoire — 42×9.5mm"],
+      ["Plastic Timing Pulley 62T","Poulie crantée plastique 62T","Accessory — for the DC motor","Accessoire — pour moteur CC"],
+      ["Mini Caster Wheel","Mini roulette pivotante","Accessory — black nylon, 360° movement","Accessoire — nylon noir, 360°"],
+      ["Motor Shaft Connector","Connecteur d'axe moteur","Accessory — links motor and wheel","Accessoire — relie moteur et roue"]
+    ]
+  },
+  {
+    id: "mbot1", code: "02", name: "mBot v1.1",
+    tagline: "Entry-level educational robot — blue chassis",
+    tags: ["mCore", "IR Remote", "Bluetooth", "Arduino C"],
+    description: "Robot d'entrée de gamme sur carte mCore (Arduino-compatible) avec trois modes préréglés : contrôle infrarouge, évitement d'obstacles et suivi de ligne. Programmable en mBlock, mBlockly ou Arduino IDE.",
+    parts: [
+      ["mCore (main board)","Carte mCore (carte principale)","Arduino-based, drives motors and sensors","Basée sur Arduino, gère moteurs et capteurs"],
+      ["On-Board Push Button","Bouton-poussoir intégré","Switches modes without a remote","Change de mode sans télécommande"],
+      ["On-board RGB LED","LED RVB intégrée","Shows the active mode by color","Indique le mode actif par couleur"],
+      ["Ultrasonic Sensor","Capteur à ultrasons","Used in obstacle-avoidance mode","Mode évitement d'obstacles"],
+      ["Line Follower Module","Module suiveur de ligne","Used in line-following mode","Mode suivi de ligne"],
+      ["IR Remote Control","Télécommande infrarouge","Included as a gift, CR2025 battery","Fournie en cadeau, pile CR2025"],
+      ["Bluetooth Module","Module Bluetooth","Bluetooth 2.0 & 4.0 compatible, phone control","Compatible Bluetooth 2.0 et 4.0, pilotage smartphone"],
+      ["2.4G Module","Module 2.4G","USB dongle + wireless module, no pairing needed","Clé USB + module sans fil, sans appairage"],
+      ["AA Battery Holder","Support de piles AA","4 × AA batteries (not included)","4 × piles AA (non incluses)"],
+      ["Lithium Battery","Batterie lithium","3.7V, 2.0 connector, on-board USB charging","3.7V, connecteur 2.0, charge USB embarquée"],
+      ["Velcro Sticker Pad","Patch Velcro adhésif","Fixes the battery holder to the chassis","Fixe le support de piles au châssis"],
+      ["M4×8mm Screw","Vis M4×8mm","Chassis fastening","Fixation du châssis"],
+      ["DC Motor","Moteur à courant continu","Drives the wheels","Entraîne les roues"],
+      ["Wheel / Tire","Roue / pneu","Rolls the robot along","Roulement du robot"]
+    ]
+  },
+  {
+    id: "ranger", code: "03", name: "mBot Ranger",
+    tagline: "3-in-1 kit — Land Raider · Dashing Raptor · Nervous Bird",
+    tags: ["Me Auriga", "3-en-1", "Auto-équilibrage", "mBlock/Arduino"],
+    description: "Kit STEM transformable en trois robots : un tank tout-terrain (Land Raider), une voiture de course à trois roues (Dashing Raptor) et un robot auto-équilibré (Nervous Bird), tous pilotés par la carte Me Auriga.",
+    parts: [
+      ["Me Auriga (main board)","Carte principale Me Auriga","ATmega2560, 6-12V DC, 2 motor ports M1/M2","ATmega2560, 6-12V DC, 2 ports moteur M1/M2"],
+      ["Light Sensor (×2 on-board)","Capteur de lumière (×2 intégrés)","Measures ambient light intensity","Mesure l'intensité lumineuse ambiante"],
+      ["Sound Sensor (on-board)","Capteur de son (intégré)","Based on the LM386 amplifier, values 0-1023","Basé sur ampli LM386, valeurs 0-1023"],
+      ["Gyroscope Sensor (on-board)","Capteur gyroscopique (intégré)","MPU-6050, 3-axis + accelerometer, DMP","MPU-6050, 3 axes + accéléromètre, DMP"],
+      ["Temperature Sensor (on-board)","Capteur de température (intégré)","NTC thermistor -40°C to 125°C","Thermistance NTC -40°C à 125°C"],
+      ["Me Ultrasonic Sensor","Capteur à ultrasons Me","Distance 3-400cm, yellow port","Distance 3-400cm, port jaune"],
+      ["Me Line Follower Sensor","Capteur suiveur de ligne Me","Detection range 1-2cm, blue port","Détection 1-2cm, port bleu"],
+      ["180 Encoder Motor","Moteur à encodeur 180","DC motor with position feedback","Moteur CC avec retour de position"],
+      ["Battery Holder (6×AA)","Support de piles (6×AA)","1.2V rechargeable or 1.5V alkaline","1.2V rechargeables ou 1.5V alcalines"],
+      ["Beam0824-112 / -48","Poutre structurelle 0824-112 / -48","Aluminum chassis elements","Éléments de châssis en aluminium"],
+      ["Plate 0324-88 / 135°","Plaque structurelle 0324-88 / 135°","Body panels","Panneaux de carrosserie"],
+      ["Bracket 3×3 / U1","Équerre de fixation 3×3 / U1","Angular assembly","Assemblage angulaire"],
+      ["Mini Caster Wheel","Mini roulette pivotante","360° free-rolling wheel","Roue folle 360°"],
+      ["62T / 90T Wheel","Roue 62 dents / 90 dents","Drive wheels with tire","Roues motrices avec pneu"],
+      ["Track","Chenille","Used in the tank build (Land Raider)","Pour la configuration tank (Land Raider)"],
+      ["Copper Bush 4×8×4mm","Douille en cuivre 4×8×4mm","Spacer/bearing for shafts","Espaceur/roulement pour axes"],
+      ["Brass Stud M4×30+6","Entretoise laiton M4×30+6","Structural spacing","Écartement structurel"],
+      ["RJ25 Cable-20cm","Câble RJ25-20cm","Connects sensors to the Auriga board","Connexion capteurs ↔ carte Auriga"],
+      ["Encoder Motor Wire","Câble de moteur à encodeur","Links motor to the EM port","Relie moteur et port EM"],
+      ["Hex & Cross Screwdriver","Tournevis hexagonal et cruciforme","Included assembly tool","Outil d'assemblage fourni"],
+      ["Wrench","Clé (à écrous)","Included fastening tool","Outil de serrage fourni"]
+    ]
+  },
+  {
+    id: "mbot2", code: "04", name: "mBot2 / CyberPi",
+    tagline: "Block-coding guide (mBlock 5)",
+    tags: ["CyberPi", "Python", "mBlock 5", "Capteurs mBuild"],
+    description: "Guide pédagogique de programmation du mBot2 via le module CyberPi (ESP32, écran couleur, joystick) en blocs mBlock ou en Python. Couvre boutons, moteurs, capteurs ultrason/couleur, et SumoBot.",
+    parts: [
+      ["CyberPi (control module)","Module de contrôle CyberPi","ESP32, Wi-Fi+Bluetooth, 1.44\" 128×128px screen","ESP32, Wi-Fi+Bluetooth, écran 1.44\" 128×128px"],
+      ["5-way Joystick","Joystick 5 directions","Built-in directional control on the CyberPi","Contrôle directionnel intégré au CyberPi"],
+      ["Button A / Button B","Bouton A / Bouton B","A = return, B = confirm","A = retour, B = confirmer"],
+      ["Home Button","Bouton Accueil","Stops a program running in an infinite loop","Arrête un programme en boucle infinie"],
+      ["Light Sensor (on CyberPi)","Capteur de lumière (sur CyberPi)","Built into the CyberPi module","Intégré au module CyberPi"],
+      ["Microphone (on CyberPi)","Microphone (sur CyberPi)","Detects sound volume","Détection de volume sonore"],
+      ["1.44'' Full-color Display","Écran couleur 1.44 pouces","128×128 pixels, shows data","128×128 pixels, affichage de données"],
+      ["USB-C Port","Port USB-C","Power and data transfer","Alimentation et transfert de données"],
+      ["mBuild Port","Port mBuild","Connects modular sensors (ultrasonic, color)","Connexion capteurs modulaires (ultrason, couleur)"],
+      ["Ultrasonic Sensor 2","Capteur à ultrasons 2","mBuild version, distance measurement","Version mBuild, mesure de distance"],
+      ["Quad RGB Sensor","Capteur RVB quadruple","Line and color detection (L1/R1/L2/R2)","Détection de ligne et de couleur (L1/R1/L2/R2)"],
+      ["DC Motor Port (M1/M2)","Port moteur CC (M1/M2)","Additional non-encoder motors","Moteurs additionnels non-encodés"],
+      ["Encoder Motor Port (EM1/EM2)","Port moteur à encodeur (EM1/EM2)","Main chassis drive motors","Moteurs principaux du châssis"],
+      ["Servo Port (S3/S4)","Port servomoteur (S3/S4)","Up to 4 servos","Jusqu'à 4 servos"],
+      ["Multi-function Port (S1/S2)","Port polyvalent (S1/S2)","Analog/digital inputs","Entrées analogiques/numériques"],
+      ["Power Switch","Interrupteur d'alimentation","Must be on before uploading code","À allumer avant le téléversement du code"],
+      ["mBot2 Shield","Carte d'extension mBot2","Interface between CyberPi and the chassis","Interface entre CyberPi et le châssis"],
+      ["Pocket Shield","Carte d'extension de poche","Portable extension for the CyberPi","Extension portable pour CyberPi"]
+    ]
+  },
+  {
+    id: "ultimate", code: "05", name: "Ultimate 2.0",
+    tagline: "10-in-1 robot kit — Robotic Arm Tank · Beverage Robot · Camera Dolly…",
+    tags: ["MegaPi", "10-en-1", "Arduino/Raspberry Pi", "Bras robotisé"],
+    description: "Kit robotique haut de gamme sur carte MegaPi (Arduino Mega 2560), avec pièces mécaniques en aluminium renforcé permettant de construire dix robots différents dont un bras robotisé sur chenilles, un robot serveur de boissons et un chariot de caméra.",
+    parts: [
+      ["MegaPi (main board)","Carte principale MegaPi","ATMEGA2560, 6-12V DC, drives 10 servos or 8 DC motors","ATMEGA2560, 6-12V DC, pilote 10 servos ou 8 moteurs CC"],
+      ["Makeblock Robot Gripper","Pince robotique Makeblock","Grips and manipulates objects","Préhension et manipulation d'objets"],
+      ["Megapi Encoder/DC Motor Driver","Pilote moteur CC/encodeur MegaPi","4 units — high-power motor driving","4 unités — pilotage moteur haute puissance"],
+      ["Megapi Shield for RJ25","Carte d'extension MegaPi pour RJ25","Interfaces Me sensors in RJ25 format","Interface capteurs Me au format RJ25"],
+      ["Bluetooth Module","Module Bluetooth","Wireless communication with the app","Communication sans fil avec l'app"],
+      ["Me Ultrasonic Sensor","Capteur à ultrasons Me","Distance 3-400cm","Distance 3-400cm"],
+      ["Me Line Follower","Capteur suiveur de ligne Me","Follows a black/white line","Suivi de ligne noire/blanche"],
+      ["Me Shutter","Déclencheur Me (obturateur)","Remote photo trigger for DSLR cameras","Déclenchement photo à distance pour reflex"],
+      ["Me 3-Axis Accelerometer and Gyro Sensor","Accéléromètre 3 axes et gyroscope Me","MPU-6050, measures motion/tilt","MPU-6050, mesure mouvement/inclinaison"],
+      ["Me Adapter (RJ25)","Adaptateur Me RJ25","Converts the RJ25 port into 6 pins (VCC/GND/S1/S2/SDA/SCL)","Convertit le port RJ25 en 6 broches (VCC/GND/S1/S2/SDA/SCL)"],
+      ["25mm DC Encoder Motor (86/185 RPM)","Moteur à encodeur CC 25mm (86/185 tr/min)","Main motor with position feedback","Moteur principal avec retour de position"],
+      ["Battery Holder 6AA","Support de piles 6×AA","6 × 1.5V alkaline batteries (not included)","6 piles alcalines 1.5V (non incluses)"],
+      ["Beam0824 / Beam0412 series","Poutres structurelles séries 0824 / 0412","Aluminum frame of the robot","Ossature aluminium du robot"],
+      ["Slide Beam0824-176/192","Poutre coulissante 0824-176/192","Adjustable length","Ajustement de longueur variable"],
+      ["Bracket P3","Support P3","Reinforced angular fastening","Fixation angulaire renforcée"],
+      ["25mm DC Motor Bracket","Support moteur CC 25mm","Fastens the motor to the chassis","Fixation du moteur au châssis"],
+      ["Plane Bearing Turntable D34×24mm","Plateau tournant à roulement plan","360° rotation (camera swivel base)","Rotation à 360° (base pivotante caméra)"],
+      ["Quick Release Plate","Plaque à dégagement rapide","Quick attach/detach of a module (camera)","Fixation/retrait rapide d'un module (caméra)"],
+      ["360° Mobile Phone Bracket","Support smartphone 360°","Holds a phone for the Camera Dolly","Fixe un téléphone pour le Camera Dolly"],
+      ["Track 80×139mm","Chenille 80×139mm","Tracks for the Robotic Arm Tank","Chenilles du Robotic Arm Tank"],
+      ["Plastic Gear 8T / 56T / 72T","Engrenage plastique 8 / 56 / 72 dents","Mechanical transmission","Transmission mécanique"],
+      ["Plastic Timing Pulley 90T","Poulie crantée plastique 90 dents","Drives the tracks","Entraînement des chenilles"],
+      ["Shaft Collar 4mm","Collier d'arbre 4mm","Holds a shaft in place axially","Maintien axial d'un axe"],
+      ["Threaded Shaft 4×39mm","Axe fileté 4×39mm","Threaded joint","Articulation filetée"],
+      ["D Shaft (D4×50/88/160mm)","Axe méplat D4×50/88/160mm","Anti-slip rotary transmission","Transmission rotative anti-glissement"],
+      ["Flange Copper Sleeve 4×8×4mm","Douille en cuivre à collerette 4×8×4mm","Reduces friction on a shaft","Réduction de friction sur axe"],
+      ["Rubber Blanket","Bande de caoutchouc","Grip on the wheel/track","Adhérence sur roue/chenille"],
+      ["Nylon Cable Tie","Collier de serrage nylon","Cable management","Rangement des câbles"],
+      ["Cross & 2.5mm HEX Screwdriver","Tournevis cruciforme et hexagonal 2.5mm","Included assembly tool","Outil d'assemblage fourni"],
+      ["Small Fourway Socket Wrench","Petite clé à douille 4 voies","Included fastening tool","Outil de serrage fourni"]
+    ]
+  }
+];
+
+const GLOSSARY = [
+  ["Sensor","Capteur","Electronique","Module qui détecte une grandeur physique (lumière, son, distance…) et la convertit en signal.",["neuron","mbot1","ranger","mbot2","ultimate"]],
+  ["Motor","Moteur","Mécanique","Convertit l'énergie électrique en mouvement rotatif.",["neuron","mbot1","ranger","mbot2","ultimate"]],
+  ["Encoder Motor","Moteur à encodeur","Mécanique","Moteur équipé d'un capteur de position/vitesse pour un contrôle précis.",["ranger","mbot2","ultimate"]],
+  ["Servo / Servomotor","Servomoteur","Mécanique","Moteur à angle contrôlé, typiquement 0-180°.",["neuron","ultimate","mbot2"]],
+  ["DC Motor","Moteur à courant continu (CC)","Mécanique","Moteur simple sans retour de position.",["neuron","mbot1"]],
+  ["Gyroscope Sensor","Capteur gyroscopique","Electronique","Mesure la vitesse angulaire et l'orientation ; utile pour l'auto-équilibrage.",["neuron","ranger","ultimate"]],
+  ["Ultrasonic Sensor","Capteur à ultrasons","Electronique","Mesure la distance par écho sonore (3 à 400cm selon modèle).",["neuron","ranger","mbot2","ultimate"]],
+  ["Line Follower Sensor","Capteur suiveur de ligne","Electronique","Détecte le contraste noir/blanc au sol pour suivre une ligne.",["neuron","ranger","ultimate"]],
+  ["Light Sensor","Capteur de lumière","Electronique","Mesure l'intensité lumineuse ambiante.",["neuron","ranger","mbot2"]],
+  ["Sound Sensor","Capteur de son","Electronique","Mesure l'intensité sonore ambiante.",["neuron","ranger"]],
+  ["Color Sensor","Capteur de couleur","Electronique","Identifie la couleur d'une surface.",["neuron"]],
+  ["PIR Sensor","Capteur infrarouge passif","Electronique","Détecte la présence/mouvement humain.",["neuron"]],
+  ["Temperature Sensor","Capteur de température","Electronique","Mesure la température ambiante ou d'un liquide.",["neuron","ranger"]],
+  ["Humidity Sensor","Capteur d'humidité","Electronique","Mesure le taux d'humidité de l'air ou du sol.",["neuron"]],
+  ["Quad RGB Sensor","Capteur RVB quadruple","Electronique","4 capteurs de couleur pour un suivi de ligne précis.",["mbot2"]],
+  ["RGB LED","LED RVB","Electronique","Diode dont la couleur est réglable en rouge/vert/bleu.",["neuron","ranger","ultimate"]],
+  ["Buzzer","Buzzer / avertisseur sonore","Electronique","Émet un signal sonore simple.",["neuron"]],
+  ["Display","Écran / afficheur","Electronique","Affiche du texte ou des valeurs numériques.",["neuron","mbot2"]],
+  ["Camera","Caméra","Electronique","Capture des images fixes ou vidéo.",["neuron","ultimate"]],
+  ["Microphone","Microphone","Electronique","Capte le son ambiant.",["neuron","mbot2"]],
+  ["Speaker","Haut-parleur","Electronique","Diffuse du son.",["neuron","mbot2"]],
+  ["Joystick","Joystick / manette","Electronique","Manette à 2 axes (X/Y) pour le contrôle directionnel.",["neuron","mbot2"]],
+  ["Button","Bouton","Electronique","Interrupteur poussoir à pression courte ou longue.",["neuron","mbot1","mbot2"]],
+  ["Knob / Potentiometer","Bouton rotatif / potentiomètre","Electronique","Réglage continu par rotation.",["neuron"]],
+  ["Bluetooth Module","Module Bluetooth","Electronique","Communication sans fil courte portée (~10m).",["neuron","mbot1","ranger","ultimate"]],
+  ["Wi-Fi Module","Module Wi-Fi","Electronique","Connexion réseau sans fil, souvent pour l'IoT.",["neuron"]],
+  ["2.4G Module","Module 2.4G","Electronique","Liaison sans fil sans appairage, type souris sans fil.",["mbot1"]],
+  ["Wireless Transmitter/Receiver","Émetteur/Récepteur sans fil","Electronique","Paire de blocs envoyant/recevant un signal.",["neuron"]],
+  ["Main Control Board","Carte de contrôle principale","Electronique","Cerveau du robot (mCore, Me Auriga, MegaPi, CyberPi).",["mbot1","ranger","ultimate","mbot2"]],
+  ["Microcontroller","Microcontrôleur","Electronique","Puce programmable qui exécute le code du robot.",["ranger","ultimate"]],
+  ["I/O Pin","Broche E/S","Electronique","Point de connexion entrée/sortie sur la carte.",["ultimate"]],
+  ["Voltage","Tension","Electronique","Différence de potentiel électrique (Volts).",["neuron","ranger","ultimate"]],
+  ["Current","Courant","Electronique","Intensité du flux électrique (Ampères).",["neuron"]],
+  ["Firmware","Micrologiciel","Programmation","Logiciel embarqué qui contrôle le matériel.",["mbot1","mbot2"]],
+  ["Firmware Update","Mise à jour du micrologiciel","Programmation","Installation d'une nouvelle version du firmware.",["mbot2"]],
+  ["Upload (code)","Téléverser (le code)","Programmation","Envoyer un programme depuis l'ordinateur vers le robot.",["mbot1","mbot2","ranger"]],
+  ["Upload Mode","Mode téléversement","Programmation","Mode d'exécution : le code est envoyé puis stocké sur le robot.",["mbot2"]],
+  ["Live Mode","Mode direct","Programmation","Mode d'exécution : le code s'exécute en temps réel sans être stocké.",["mbot2"]],
+  ["Graphical Programming","Programmation graphique","Programmation","Coder en assemblant des blocs visuels (façon puzzle).",["neuron","mbot1","ranger","mbot2"]],
+  ["Block Coding","Codage par blocs","Programmation","Synonyme de programmation graphique.",["mbot2"]],
+  ["mBlock","mBlock","Programmation","Logiciel de programmation graphique Makeblock basé sur Scratch.",["neuron","mbot1","ranger","mbot2","ultimate"]],
+  ["mBlockly","mBlockly","Programmation","Application de programmation graphique pour tablette.",["mbot1"]],
+  ["Arduino Programming (C)","Programmation Arduino (langage C)","Programmation","Programmation textuelle avancée via l'IDE Arduino.",["mbot1","ranger","ultimate"]],
+  ["Loop / Forever block","Boucle / bloc « pour toujours »","Programmation","Répète des instructions indéfiniment.",["mbot2"]],
+  ["Repeat block","Bloc « répéter »","Programmation","Répète des instructions un nombre de fois défini.",["mbot2"]],
+  ["If / Else block","Bloc « si / sinon »","Programmation","Exécute une action selon une condition.",["mbot2"]],
+  ["Variable","Variable","Programmation","Emplacement mémoire nommé pour stocker une valeur.",["mbot2"]],
+  ["Function (define)","Fonction (définir)","Programmation","Bloc de code réutilisable regroupé sous un nom.",["mbot2"]],
+  ["App (companion app)","Application (compagnon)","Programmation","Application mobile de pilotage du robot.",["neuron","ranger","ultimate"]],
+  ["IoT (Internet of Things)","IdO (Internet des objets)","Programmation","Connexion d'objets physiques à Internet.",["neuron","ultimate"]],
+  ["Battery","Pile / batterie","Alimentation","Source d'énergie électrique du robot.",["neuron","mbot1","ranger","ultimate"]],
+  ["Rechargeable Battery","Batterie rechargeable","Alimentation","Batterie pouvant être rechargée (lithium ou NiMH).",["neuron","mbot1","ranger"]],
+  ["Alkaline Battery","Pile alcaline","Alimentation","Pile non rechargeable à usage unique.",["mbot1","ranger","ultimate"]],
+  ["Battery Holder","Support de piles","Alimentation","Compartiment logeant les piles.",["mbot1","ranger","ultimate"]],
+  ["Power Switch","Interrupteur d'alimentation","Alimentation","Bouton marche/arrêt du robot.",["mbot1","ranger","ultimate","mbot2"]],
+  ["Power Indicator","Indicateur d'alimentation","Alimentation","Voyant signalant l'état de charge/marche.",["neuron","ultimate"]],
+  ["USB Cable","Câble USB","Alimentation","Câble de charge et/ou de transfert de données.",["neuron","mbot1","ranger","ultimate"]],
+  ["Low Battery Indicator","Indicateur de batterie faible","Alimentation","Signal (ralentissement, redémarrage) indiquant une batterie faible.",["ranger","ultimate"]],
+  ["Chassis","Châssis","Mécanique","Structure porteuse du robot.",["mbot1","ranger","mbot2"]],
+  ["Wheel","Roue","Mécanique","Élément de roulement circulaire.",["mbot1","ranger","ultimate"]],
+  ["Tire","Pneu","Mécanique","Revêtement en caoutchouc de la roue.",["ranger","ultimate"]],
+  ["Track (tank tread)","Chenille","Mécanique","Bande articulée remplaçant les roues sur terrain difficile.",["ranger","ultimate"]],
+  ["Gear","Engrenage","Mécanique","Roue dentée transmettant un mouvement rotatif.",["ultimate"]],
+  ["Bracket","Support / équerre","Mécanique","Pièce de fixation angulaire.",["ranger","ultimate"]],
+  ["Beam","Poutre","Mécanique","Élément structurel allongé en aluminium.",["ranger","ultimate"]],
+  ["Plate","Plaque","Mécanique","Panneau structurel plat.",["ranger","ultimate"]],
+  ["Shaft","Axe / arbre","Mécanique","Tige de transmission rotative.",["ultimate"]],
+  ["Bearing","Roulement","Mécanique","Réduit la friction entre deux pièces en rotation.",["ultimate"]],
+  ["Screw","Vis","Mécanique","Fixation filetée.",["ranger","ultimate"]],
+  ["Nut","Écrou","Mécanique","Pièce filetée se vissant sur une vis.",["ranger","ultimate"]],
+  ["Wrench","Clé (de serrage)","Mécanique","Outil de serrage des écrous.",["ranger","ultimate"]],
+  ["Screwdriver","Tournevis","Mécanique","Outil de serrage des vis.",["ranger","ultimate"]],
+  ["Rubber Band","Élastique","Mécanique","Bande élastique de maintien.",["ultimate"]],
+  ["Cable Tie","Collier de serrage","Mécanique","Attache pour ranger les câbles.",["ultimate"]],
+  ["Gripper","Pince (robotique)","Mécanique","Effecteur permettant de saisir un objet.",["ultimate"]],
+  ["Robotic Arm","Bras robotisé","Mécanique","Bras articulé motorisé.",["ultimate"]],
+  ["Turntable","Plateau tournant","Mécanique","Base rotative à 360°.",["ultimate"]],
+  ["Obstacle Avoidance","Évitement d'obstacles","Comportement","Mode où le robot contourne les obstacles détectés.",["mbot1","mbot2"]],
+  ["Line-Following","Suivi de ligne","Comportement","Mode où le robot suit une ligne tracée au sol.",["mbot1","ranger","mbot2"]],
+  ["Self-Balancing","Auto-équilibrage","Comportement","Le robot maintient son équilibre grâce au gyroscope.",["ranger"]],
+  ["SumoBot","Robot de sumo","Comportement","Robot combattant conçu pour pousser l'adversaire hors d'un cercle.",["mbot2"]],
+  ["IR Remote Control","Télécommande infrarouge","Electronique","Boîtier de commande à distance par infrarouge.",["mbot1"]],
+  ["Reset Button","Bouton de réinitialisation","Electronique","Redémarre la carte électronique.",["neuron","mbot2"]],
+  ["Interface (port)","Interface (port)","Electronique","Point de connexion entre carte et module.",["neuron","ranger"]],
+  ["Wireless Communication","Communication sans fil","Electronique","Échange de données sans câble (Bluetooth, Wi-Fi, 2.4G).",["mbot1","neuron"]]
+];
+
+/* ============================================================
+   QUIZZES — 5 questions per robot
+   ============================================================ */
+const QUIZZES = {
+  neuron: [
+    { q:"How do you say « Capteur de lumière » in English?", options:["Light Sensor","Light Bulb","Bright Module","Vision Sensor"], correct:0 },
+    { q:"What is a Buzzer?", options:["A display screen","A sound alarm / beeper","A rotary knob","A speaker only"], correct:1 },
+    { q:"Which Neuron block is GREEN?", options:["Button","Power block","RGB LED","Line Follower Sensor"], correct:1 },
+    { q:"The PIR Sensor is used to detect:", options:["Color","Human motion (passive infrared)","Temperature","Sound"], correct:1 },
+    { q:"« Funny Touch » refers to:", options:["A playful touch sensor","A remote control","A motor","A regular touchscreen"], correct:0 }
+  ],
+  mbot1: [
+    { q:"What is the « mCore »?", options:["A sensor","The main board (Arduino-based)","A tire","A remote control"], correct:1 },
+    { q:"What does « Line Follower Module » mean?", options:["A module that follows a line","A Bluetooth module","A battery holder","A push button"], correct:0 },
+    { q:"How many AA batteries does the included holder use?", options:["2","4","6","8"], correct:1 },
+    { q:"« IR Remote Control » translates to:", options:["Infrared remote control","USB cable","2.4G module","Bluetooth board"], correct:0 },
+    { q:"The mode where the robot avoids objects is called:", options:["Line-Following mode","Obstacle Avoidance mode","IR Control mode","Sleep mode"], correct:1 }
+  ],
+  ranger: [
+    { q:"« Me Auriga » is:", options:["A sound sensor","The Ranger's main board","A wheel","A battery holder"], correct:1 },
+    { q:"How do you say « Capteur gyroscopique » in English?", options:["Gyroscope Sensor","Balance Sensor","Motion Wheel","Turn Sensor"], correct:0 },
+    { q:"Which of these robots is NOT one of the Ranger's 3 forms?", options:["Land Raider","Dashing Raptor","Nervous Bird","Camera Dolly"], correct:3 },
+    { q:"What is a « Track » (mechanical part)?", options:["A tank tread","A rail","A path","A trail"], correct:0 },
+    { q:"What voltage does the Ranger's battery holder use?", options:["3V (2×AA)","7.2V (2×LiPo)","1.2V or 1.5V (6×AA)","12V (car battery)"], correct:2 }
+  ],
+  mbot2: [
+    { q:"« CyberPi » is:", options:["A line sensor","The control module (screen + joystick)","A servo","A track"], correct:1 },
+    { q:"The « Quad RGB Sensor » is mainly used to:", options:["Measure temperature","Follow a line and detect colors","Measure sound","Control a servo"], correct:1 },
+    { q:"Before uploading code, you must first:", options:["Nothing special","Turn on the power switch","Remove the battery","Close the software"], correct:1 },
+    { q:"A « Forever block » is used to:", options:["Run once only","Repeat instructions indefinitely","Stop the program","Reset the board"], correct:1 },
+    { q:"The « Home Button » is used to:", options:["Switch Bluetooth mode","Stop a program running in an infinite loop","Turn on the camera","Recharge the battery"], correct:1 }
+  ],
+  ultimate: [
+    { q:"« MegaPi » is based on which microcontroller?", options:["ESP32","ATMEGA2560","Raspberry Pi 4","STM32"], correct:1 },
+    { q:"How do you say « Pince robotique » in English?", options:["Robotic Arm","Robot Gripper","Robot Claw Sensor","Turntable"], correct:1 },
+    { q:"What is the « Me Shutter » used for?", options:["Following a line","Remotely triggering a DSLR camera photo","Measuring distance","Powering the robot"], correct:1 },
+    { q:"How many different robots can the Ultimate 2.0 kit build?", options:["3","5","10","Only 1"], correct:2 },
+    { q:"What does « Plane Bearing Turntable » mean?", options:["Quick release plate","A flat-bearing rotating platform","A motor bracket","A threaded shaft"], correct:1 }
+  ]
+};
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const nav = document.getElementById('robotNav');
+const main = document.getElementById('mainContent');
+
+function pickVocabFor(id){
+  return GLOSSARY.filter(g => g[4].includes(id));
+}
+
+ROBOTS.forEach((r, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'rtab' + (i===0 ? ' active' : '');
+  btn.dataset.id = r.id;
+  btn.innerHTML = `<span class="code">${r.code}</span>${r.name}`;
+  btn.onclick = () => selectRobot(r.id);
+  nav.appendChild(btn);
+
+  const sec = document.createElement('section');
+  sec.className = 'panel' + (i===0 ? ' active' : '');
+  sec.id = 'panel-' + r.id;
+
+  const sideVocab = pickVocabFor(r.id).slice(0,6).map(v => `
+    <div class="vocab-card">
+      <div class="pin"></div>
+      <div class="vocab-en">${v[0]}</div>
+      <div class="vocab-fr">${v[1]}</div>
+      <div class="vocab-def">${v[3]}</div>
+    </div>`).join('');
+
+  const nq = QUIZZES[r.id].length;
+
+  sec.innerHTML = `
+    <div class="robot-head">
+      <div>
+        <h2>${r.name}</h2>
+        <p>${r.description}</p>
+      </div>
+      <div class="tagbar">${r.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h3 class="section-label">Liste des pièces / Parts List</h3>
+        <div class="part-scroll">
+          <table class="parts-table">
+            <thead><tr><th>English</th><th>Français</th><th>Note (EN)</th><th>Note (FR)</th></tr></thead>
+            <tbody>
+              ${r.parts.map(p => `<tr><td class="en">${p[0]}</td><td class="fr-cell">${p[1]}</td><td class="note-en">${p[2]}</td><td class="note-fr">${p[3]}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3 class="section-label">Vocabulaire clé</h3>
+        ${sideVocab}
+      </div>
+    </div>
+
+    <div class="quiz-wrap">
+      <div class="quiz-intro">
+        <div>
+          <h3 class="section-label" style="margin-bottom:4px;">Comprehension Quiz</h3>
+          <p>Test what you've learned about the vocabulary and parts of the ${r.name}.</p>
+        </div>
+        <div class="quiz-score" id="score-${r.id}">Score: <b>0</b> / ${nq}</div>
+      </div>
+      <div class="quiz-list" id="quiz-${r.id}"></div>
+      <div class="quiz-actions">
+        <button class="btn" id="check-${r.id}">Check my answers</button>
+        <button class="btn secondary" id="retry-${r.id}">Try again</button>
+        <div class="quiz-result" id="result-${r.id}"></div>
+      </div>
+    </div>
+  `;
+  main.appendChild(sec);
+  buildQuiz(r.id);
+});
+
+function selectRobot(id){
+  document.querySelectorAll('.rtab').forEach(b => b.classList.toggle('active', b.dataset.id === id));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-'+id));
+  window.scrollTo({top: nav.offsetTop, behavior:'smooth'});
+}
+
+document.getElementById('statTerms').textContent = GLOSSARY.length + '+';
+document.getElementById('statParts').textContent = ROBOTS.reduce((s,r)=>s+r.parts.length,0) + '+';
+
+/* ---------------- QUIZ LOGIC ---------------- */
+function buildQuiz(robotId){
+  const questions = QUIZZES[robotId];
+  const container = document.getElementById('quiz-' + robotId);
+  const checkBtn = document.getElementById('check-' + robotId);
+  const retryBtn = document.getElementById('retry-' + robotId);
+  const scoreEl = document.getElementById('score-' + robotId);
+  const resultEl = document.getElementById('result-' + robotId);
+
+  function render(){
+    container.innerHTML = questions.map((item, qi) => `
+      <div class="qcard" data-qi="${qi}">
+        <span class="qnum">Question ${qi+1} / ${questions.length}</span>
+        <div class="qtext">${item.q}</div>
+        <div class="qopts">
+          ${item.options.map((opt, oi) => `
+            <label class="qopt" data-oi="${oi}">
+              <input type="radio" name="q-${robotId}-${qi}" value="${oi}">
+              <span>${opt}</span>
+            </label>
+          `).join('')}
+        </div>
+        <div class="qfeedback" id="fb-${robotId}-${qi}"></div>
+      </div>
+    `).join('');
+    checkBtn.disabled = false;
+    resultEl.classList.remove('show');
+    scoreEl.innerHTML = `Score: <b>0</b> / ${questions.length}`;
+  }
+  render();
+
+  checkBtn.onclick = () => {
+    let score = 0;
+    questions.forEach((item, qi) => {
+      const card = container.querySelector(`.qcard[data-qi="${qi}"]`);
+      const selected = card.querySelector('input:checked');
+      const fb = document.getElementById(`fb-${robotId}-${qi}`);
+      const opts = [...card.querySelectorAll('.qopt')];
+      opts.forEach(o => { o.querySelector('input').disabled = true; });
+
+      if(!selected){
+        fb.textContent = "No answer selected.";
+        fb.className = 'qfeedback show ko';
+        opts[item.correct].classList.add('correct');
+        return;
+      }
+      const oi = parseInt(selected.value, 10);
+      if(oi === item.correct){
+        score++;
+        opts[oi].classList.add('correct');
+        fb.textContent = "Correct!";
+        fb.className = 'qfeedback show ok';
+      } else {
+        opts[oi].classList.add('wrong');
+        opts[item.correct].classList.add('correct');
+        fb.textContent = "Not quite — correct answer highlighted in green.";
+        fb.className = 'qfeedback show ko';
+      }
+    });
+
+    scoreEl.innerHTML = `Score: <b>${score}</b> / ${questions.length}`;
+    resultEl.classList.add('show');
+    const perfect = score === questions.length;
+    const half = score >= Math.ceil(questions.length/2);
+    resultEl.style.borderColor = perfect ? 'var(--ok)' : 'var(--line)';
+    resultEl.style.color = perfect ? 'var(--ok)' : 'var(--ink-dim)';
+    resultEl.textContent = perfect
+      ? "Perfect! Vocabulary mastered."
+      : half
+        ? "Not bad — review the mistakes above."
+        : "A bit more practice needed — re-read the key vocabulary on the left.";
+    checkBtn.disabled = true;
+  };
+
+  retryBtn.onclick = render;
+}
+
+/* ---------------- GLOSSARY SEARCH/FILTER ---------------- */
+const CATS = [...new Set(GLOSSARY.map(g => g[2]))];
+const catFilters = document.getElementById('catFilters');
+let activeCat = 'all';
+
+const allBtn = document.createElement('button');
+allBtn.className = 'cat-btn active';
+allBtn.textContent = 'Tout';
+allBtn.onclick = () => { activeCat='all'; refreshCatButtons(); renderGlossary(); };
+catFilters.appendChild(allBtn);
+
+CATS.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'cat-btn';
+  b.textContent = c;
+  b.onclick = () => { activeCat = c; refreshCatButtons(); renderGlossary(); };
+  catFilters.appendChild(b);
+});
+
+function refreshCatButtons(){
+  [...catFilters.children].forEach(b => {
+    b.classList.toggle('active', (b.textContent==='Tout' && activeCat==='all') || b.textContent===activeCat);
+  });
+}
+
+const robotNames = Object.fromEntries(ROBOTS.map(r=>[r.id, r.code]));
+
+function renderGlossary(){
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const grid = document.getElementById('glosGrid');
+  const countEl = document.getElementById('glosCount');
+  const noRes = document.getElementById('noResults');
+  grid.innerHTML = '';
+
+  const filtered = GLOSSARY.filter(g => {
+    const matchesCat = activeCat==='all' || g[2]===activeCat;
+    const matchesQ = !q || g[0].toLowerCase().includes(q) || g[1].toLowerCase().includes(q) || g[3].toLowerCase().includes(q);
+    return matchesCat && matchesQ;
+  });
+
+  countEl.textContent = `${filtered.length} terme${filtered.length>1?'s':''} affiché${filtered.length>1?'s':''} sur ${GLOSSARY.length}`;
+  noRes.style.display = filtered.length ? 'none' : 'block';
+
+  filtered.forEach(g => {
+    const div = document.createElement('div');
+    div.className = 'glos-item';
+    div.innerHTML = `
+      <div class="glos-top">
+        <div class="glos-en">${g[0]}</div>
+        <div class="glos-badge">${g[2]}</div>
+      </div>
+      <div class="glos-fr">${g[1]}</div>
+      <div class="glos-def">${g[3]}</div>
+      <div class="glos-robots">${g[4].map(id=>`<span class="rchip">${robotNames[id]||id}</span>`).join('')}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+document.getElementById('search').addEventListener('input', renderGlossary);
+renderGlossary();
+</script>
+</body>
+</html>
